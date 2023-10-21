@@ -6,10 +6,9 @@ mod image_id;
 
 use image::resize_png;
 use image_id::ImageId;
-use rocket::http::uri::Absolute;
 use rocket::{
     form::Form,
-    fs::{relative, FileServer, NamedFile, TempFile},
+    fs::{relative, FileServer, TempFile},
     http::ContentType,
     response::Redirect,
     tokio::fs::File,
@@ -18,12 +17,11 @@ use rocket::{
 use rocket_dyn_templates::{context, Template};
 use std::{
     fs, io,
-    path::{Path, PathBuf},
+    path::Path,
 };
 
 // In a real application, these would be retrieved dynamically from a config.
 const ID_LENGTH: usize = 5;
-const HOST: Absolute<'static> = uri!("http://localhost:8000");
 const SIZES: [i32; 8] = [1920, 1280, 1024, 768, 640, 480, 320, 240];
 
 #[get("/")]
