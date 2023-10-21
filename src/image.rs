@@ -1,13 +1,11 @@
 use std::path::{Path, PathBuf};
 
-use libvips::{VipsImage, ops};
+use libvips::{ops, VipsImage};
 
 pub fn resize_png(id: PathBuf, max_width_size: i32) -> String {
     println!("Resizing image: {:?} - {}", id, max_width_size);
     let upload_dir = concat!(env!("CARGO_MANIFEST_DIR"), "/", "upload");
-    let original_file_name = Path::new(upload_dir)
-        .join(id.clone())
-        .join("original");
+    let original_file_name = Path::new(upload_dir).join(id.clone()).join("original");
     let new_file_name = Path::new(upload_dir)
         .join(id)
         .join(max_width_size.to_string());
