@@ -1,0 +1,22 @@
+[package]
+name = "htmx-demo"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+base64 = "0.21.4"
+glib-sys = "0.18.1"
+libvips = { git = "https://github.com/rtio/libvips-rust-bindings.git" }
+rocket = "=0.5.0-rc.3"
+rand = "0.8"
+
+[dependencies.uuid]
+version = "1.5.0"
+features = ["v4", "fast-rng", "macro-diagnostics"]
+
+[dependencies.rocket_dyn_templates]
+version = "=0.1.0-rc.3"
+features = ["tera"]
