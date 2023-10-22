@@ -8,7 +8,7 @@ use image::resize_from_format;
 use image_id::ImageId;
 use rocket::{
     form::Form,
-    fs::{relative, FileServer, NamedFile, TempFile},
+    fs::{NamedFile, TempFile},
     http::ContentType,
     response::Redirect,
     tokio::fs::File,
@@ -57,11 +57,14 @@ pub fn index() -> Template {
 #[post("/upload", data = "<upload>")]
 async fn upload(mut upload: Form<Upload<'_>>) -> io::Result<Redirect> {
     let id = ImageId::new(ID_LENGTH);
-    let permanent_location = id.file_path().join("original");
     fs::create_dir_all(id.file_path())?;
-    println!("Permanent location: {:?}", permanent_location);
+
+    let permanent_location = id.file_path()
+        .join("original");
     upload.image.persist_to(permanent_location).await?;
+
     println!("Image uploaded: {:?}", id.file_path());
+
     Ok(Redirect::to(uri!(resize_image(
         id,
         upload.output_format.to_string()
@@ -127,7 +130,6 @@ fn rocket() -> _ {
             "/",
             routes![index, upload, retrieve, resize_image, retrieve_original],
         )
-        .mount("/static", FileServer::from(relative!("static")))
         .attach(Template::fairing())
         .register("/", catchers![not_found])
 }

@@ -1,2 +1,7 @@
 [default]
 template_dir = "templates"
+
+[default.limits]
+"file/jpg" = "5 MiB"
+"file/png" = "5 MiB"
+"file/webp" = "5 MiB"

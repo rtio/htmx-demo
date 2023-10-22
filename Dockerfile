@@ -29,7 +29,6 @@ RUN apk add --update --no-cache \
     --repository https://dl-cdn.alpinelinux.org/alpine/v3.18/main \
     vips
 
-COPY --from=build /usr/src/app/static ${APP}/static
 COPY --from=build /usr/src/app/templates ${APP}/templates
 COPY --from=build /usr/src/app/target/release/htmx-demo ${APP}/htmx-demo
 
