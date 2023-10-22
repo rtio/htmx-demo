@@ -26,6 +26,7 @@ enum OutputFormat {
     Png,
     Jpeg,
     Webp,
+    Gif,
 }
 
 impl fmt::Display for OutputFormat {
@@ -34,6 +35,7 @@ impl fmt::Display for OutputFormat {
             OutputFormat::Png => write!(f, "png"),
             OutputFormat::Jpeg => write!(f, "jpeg"),
             OutputFormat::Webp => write!(f, "webp"),
+            OutputFormat::Gif => write!(f, "gif"),
         }
     }
 }
@@ -48,6 +50,16 @@ struct Upload<'r> {
 pub fn index() -> Template {
     Template::render(
         "index",
+        context! {
+            title: "Image Resizer"
+        },
+    )
+}
+
+#[get("/about")]
+pub fn about() -> Template {
+    Template::render(
+        "about",
         context! {
             title: "Image Resizer"
         },
@@ -82,7 +94,6 @@ fn resize_image(id: ImageId<'_>, ext: &str) -> Template {
     Template::render(
         "result",
         context! {
-            title: "Resized Image",
             images: results
         },
     )
@@ -127,7 +138,14 @@ fn rocket() -> _ {
     rocket::build()
         .mount(
             "/",
-            routes![index, upload, retrieve, resize_image, retrieve_original],
+            routes![
+                index,
+                about,
+                upload,
+                retrieve,
+                resize_image,
+                retrieve_original
+            ],
         )
         .attach(Template::fairing())
         .register("/", catchers![not_found])

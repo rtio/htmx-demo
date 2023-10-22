@@ -1,9 +1,3 @@
-{% extends "base" %}
-
-{% block content %}
-  {% for image in images %}
-    <div>
-        <img width="{{ image.maxwidth }}" src="{{ image.src }}"/>
-    </div>
-  {% endfor %}
-{% endblock content %}
+{% for image in images %}
+<img class="m-3" width="{{ image.maxwidth }}" src="{{ image.src }}" />
+{% endfor %}
