@@ -60,9 +60,9 @@ async fn upload(mut upload: Form<Upload<'_>>) -> io::Result<Redirect> {
     fs::create_dir_all(id.file_path())?;
 
     let permanent_location = id.file_path().join("original");
-    upload.image.persist_to(permanent_location).await?;
+    upload.image.persist_to(permanent_location.clone()).await?;
 
-    println!("Image uploaded: {:?}", id.file_path());
+    println!("Image uploaded: {:?}", permanent_location);
 
     Ok(Redirect::to(uri!(resize_image(
         id,

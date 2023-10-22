@@ -30,6 +30,7 @@ RUN apk add --update --no-cache \
     vips
 
 COPY --from=build /usr/src/app/templates ${APP}/templates
+COPY --from=build /usr/src/app/Rocket.toml ${APP}/Rocket.toml
 COPY --from=build /usr/src/app/target/release/htmx-demo ${APP}/htmx-demo
 
 RUN mkdir -p ${APP}/upload
