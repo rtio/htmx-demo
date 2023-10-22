@@ -4,25 +4,45 @@ extern crate rocket;
 mod image;
 mod image_id;
 
-use image::resize_png;
+use image::resize_from_format;
 use image_id::ImageId;
 use rocket::{
     form::Form,
-    fs::{relative, FileServer, TempFile},
+    fs::{relative, FileServer, NamedFile, TempFile},
     http::ContentType,
     response::Redirect,
     tokio::fs::File,
     Request,
 };
 use rocket_dyn_templates::{context, Template};
-use std::{
-    fs, io,
-    path::Path,
-};
+use std::{fmt, fs, io, path::Path};
 
 // In a real application, these would be retrieved dynamically from a config.
 const ID_LENGTH: usize = 5;
 const SIZES: [i32; 8] = [1920, 1280, 1024, 768, 640, 480, 320, 240];
+
+#[derive(Debug, FromFormField)]
+enum OutputFormat {
+    Png,
+    Jpeg,
+    Webp,
+}
+
+impl fmt::Display for OutputFormat {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            OutputFormat::Png => write!(f, "png"),
+            OutputFormat::Jpeg => write!(f, "jpeg"),
+            OutputFormat::Webp => write!(f, "webp"),
+        }
+    }
+}
+
+#[derive(FromForm)]
+struct Upload<'r> {
+    output_format: OutputFormat,
+    image: TempFile<'r>,
+}
 
 #[get("/")]
 pub fn index() -> Template {
@@ -34,25 +54,27 @@ pub fn index() -> Template {
     )
 }
 
-#[post("/upload", data = "<image>")]
-async fn upload(mut image: Form<TempFile<'_>>) -> io::Result<Redirect> {
+#[post("/upload", data = "<upload>")]
+async fn upload(mut upload: Form<Upload<'_>>) -> io::Result<Redirect> {
     let id = ImageId::new(ID_LENGTH);
     let permanent_location = id.file_path().join("original");
     fs::create_dir_all(id.file_path())?;
     println!("Permanent location: {:?}", permanent_location);
-    image.persist_to(permanent_location).await?;
+    upload.image.persist_to(permanent_location).await?;
     println!("Image uploaded: {:?}", id.file_path());
-
-    Ok(Redirect::to(uri!(resize_image(id))))
+    Ok(Redirect::to(uri!(resize_image(
+        id,
+        upload.output_format.to_string()
+    ))))
 }
 
-#[get("/resize/<id>")]
-fn resize_image(id: ImageId<'_>) -> Template {
+#[get("/resize/<id>/<ext>")]
+fn resize_image(id: ImageId<'_>, ext: &str) -> Template {
     let mut results = vec![];
     for size in SIZES.iter() {
         results.push(context! {
             maxwidth: size,
-            src: uri!(retrieve(&id, size, "png")),
+            src: uri!(retrieve(&id, size, ext)),
         });
     }
     Template::render(
@@ -64,24 +86,25 @@ fn resize_image(id: ImageId<'_>) -> Template {
     )
 }
 
-#[get("/resize/<id>/<ext>")]
-async fn retrieve_original(id: ImageId<'_>, ext: &str) -> (ContentType, Option<File>) {
+#[get("/resized/<id>")]
+async fn retrieve_original(id: ImageId<'_>) -> (ContentType, Option<File>) {
     let upload_dir = concat!(env!("CARGO_MANIFEST_DIR"), "/", "upload");
     let filename = Path::new(upload_dir).join(id.file_path()).join("original");
     return (ContentType::PNG, File::open(&filename).await.ok());
 }
 
-#[get("/resize/<id>/<maxwidth>/<ext>")]
-async fn retrieve(id: ImageId<'_>, maxwidth: i32, ext: &str) -> (ContentType, Option<File>) {
+#[get("/resized/<id>/<maxwidth>/<ext>")]
+async fn retrieve(id: ImageId<'_>, maxwidth: i32, ext: &str) -> Option<NamedFile> {
     let upload_dir = concat!(env!("CARGO_MANIFEST_DIR"), "/", "upload");
     let filename = Path::new(upload_dir)
         .join(id.file_path())
-        .join(maxwidth.to_string());
-    match File::open(&filename).await {
-        Ok(f) => (ContentType::PNG, Some(f)),
+        .join(maxwidth.to_string())
+        .with_extension(ext);
+    match NamedFile::open(filename).await {
+        Ok(f) => Some(f),
         Err(_) => {
-            let new_file_name = resize_png(id.file_path(), maxwidth);
-            return (ContentType::PNG, File::open(&new_file_name).await.ok());
+            let new_file_name = resize_from_format(id.file_path(), maxwidth, ext);
+            NamedFile::open(&new_file_name).await.ok()
         }
     }
 }

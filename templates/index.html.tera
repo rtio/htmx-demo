@@ -5,6 +5,23 @@
     _='on htmx:xhr:progress(loaded, total) set #progress.value to (loaded/total)*100'>
     <input type='file' name='image' accept='image/png' _="on change set #image-preview.src to URL.createObjectURL(my.files[0])">
     <img id='image-preview'/>
+    <fieldset>
+        <legend>Select the format output:</legend>
+        <div>
+          <input type="radio" id="png" name="output_format" value="Png" checked />
+          <label for="png">PNG</label>
+        </div>
+      
+        <div>
+          <input type="radio" id="jpeg" name="output_format" value="Jpeg" />
+          <label for="jpeg">Jpeg</label>
+        </div>
+      
+        <div>
+          <input type="radio" id="webp" name="output_format" value="Webp" />
+          <label for="webp">WebP</label>
+        </div>
+      </fieldset>
     <button>
         Resize!
     </button>

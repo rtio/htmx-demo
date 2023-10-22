@@ -33,6 +33,8 @@ COPY --from=build /usr/src/app/static ${APP}/static
 COPY --from=build /usr/src/app/templates ${APP}/templates
 COPY --from=build /usr/src/app/target/release/htmx-demo ${APP}/htmx-demo
 
+RUN mkdir -p ${APP}/upload
+
 RUN chown -R $APP_USER:$APP_USER ${APP}
 
 USER $APP_USER
