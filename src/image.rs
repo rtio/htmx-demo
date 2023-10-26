@@ -37,13 +37,7 @@ pub fn resize_webp(id: PathBuf, max_width_size: i32) -> String {
     let f_name = original_file_name.to_str().unwrap();
     let sufix = "[n=-1]";
     let file_with_sufix = Path::new(f_name).with_file_name(format!("{}{}", f_name, sufix));
-
-    let new_image = VipsImage::new_from_file_access(
-        file_with_sufix.to_str().unwrap(),
-        ops::Access::Sequential,
-        false,
-    )
-    .unwrap();
+    let new_image = VipsImage::new_from_file(file_with_sufix.to_str().unwrap()).unwrap();
     let resized = ops::thumbnail_image(&new_image, max_width_size).unwrap();
     ops::webpsave(&resized, new_file_name.to_str().unwrap()).unwrap();
     return String::from(new_file_name.to_str().unwrap());
@@ -63,13 +57,7 @@ pub fn resize_gif(id: PathBuf, max_width_size: i32) -> String {
     let f_name = original_file_name.to_str().unwrap();
     let sufix = "[n=-1]";
     let file_with_sufix = Path::new(f_name).with_file_name(format!("{}{}", f_name, sufix));
-
-    let new_image = VipsImage::new_from_file_access(
-        file_with_sufix.to_str().unwrap(),
-        ops::Access::Sequential,
-        false,
-    )
-    .unwrap();
+    let new_image = VipsImage::new_from_file(file_with_sufix.to_str().unwrap()).unwrap();
     let resized = ops::thumbnail_image(&new_image, max_width_size).unwrap();
     ops::gifsave(&resized, new_file_name.to_str().unwrap()).unwrap();
     return String::from(new_file_name.to_str().unwrap());
