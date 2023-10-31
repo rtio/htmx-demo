@@ -68,16 +68,16 @@ pub fn about() -> Template {
 
 #[post("/upload", data = "<upload>")]
 async fn upload(mut upload: Form<Upload<'_>>) -> io::Result<Redirect> {
-    let id = ImageId::new(ID_LENGTH);
-    fs::create_dir_all(id.file_path())?;
+    let image_id = ImageId::new(ID_LENGTH);
+    fs::create_dir_all(image_id.file_path())?;
 
-    let permanent_location = id.file_path().join("original");
+    let permanent_location = image_id.file_path().join("original");
     upload.image.persist_to(permanent_location.clone()).await?;
 
     println!("Image uploaded: {:?}", permanent_location);
 
     Ok(Redirect::to(uri!(resize_image(
-        id,
+        image_id,
         upload.output_format.to_string()
     ))))
 }
