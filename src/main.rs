@@ -103,7 +103,7 @@ fn resize_image(id: ImageId<'_>, ext: &str) -> Template {
 async fn retrieve_original(id: ImageId<'_>) -> (ContentType, Option<File>) {
     let upload_dir = concat!(env!("CARGO_MANIFEST_DIR"), "/", "upload");
     let filename = Path::new(upload_dir).join(id.file_path()).join("original");
-    return (ContentType::PNG, File::open(&filename).await.ok());
+    (ContentType::PNG, File::open(&filename).await.ok())
 }
 
 #[get("/resized/<id>/<maxwidth>/<ext>")]

@@ -9,7 +9,7 @@ fn get_dirs(id: PathBuf, max_width_size: i32, ext: &str) -> (PathBuf, PathBuf) {
         .join(id)
         .join(max_width_size.to_string())
         .with_extension(ext);
-    return (original_file_name, new_file_name);
+    (original_file_name, new_file_name)
 }
 
 pub fn resize_from_format(id: PathBuf, max_width_size: i32, ext: &str) -> String {
