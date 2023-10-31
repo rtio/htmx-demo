@@ -16,6 +16,11 @@ use rocket::{
 };
 use rocket_dyn_templates::{context, Template};
 use std::{fmt, fs, io, path::Path};
+use std::sync::Once;
+use libvips::VipsApp;
+
+
+static INIT: Once = Once::new();
 
 // In a real application, these would be retrieved dynamically from a config.
 const ID_LENGTH: usize = 5;
@@ -134,7 +139,10 @@ pub fn not_found(req: &Request<'_>) -> Template {
 
 #[launch]
 fn rocket() -> _ {
-    // let app = VipsApp::new("IMAGE_RESIZER", false).expect("Cannot initialize libvips");
+    INIT.call_once(|| {
+        VipsApp::new("IMAGE_RESIZER", false).expect("Cannot initialize libvips");
+    });
+
     rocket::build()
         .mount(
             "/",
