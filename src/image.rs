@@ -23,7 +23,7 @@ pub fn resize_from_format(id: PathBuf, max_width_size: i32, ext: &str) -> String
     }
 }
 
-pub fn resize_jpeg(id: PathBuf, max_width_size: i32) -> String {
+fn resize_jpeg(id: PathBuf, max_width_size: i32) -> String {
     let (original_file_name, new_file_name) = get_dirs(id.clone(), max_width_size, "jpeg");
     let new_image = VipsImage::new_from_file(original_file_name.to_str().unwrap()).unwrap();
     let resized = ops::thumbnail_image(&new_image, max_width_size).unwrap();
@@ -31,7 +31,7 @@ pub fn resize_jpeg(id: PathBuf, max_width_size: i32) -> String {
     return String::from(new_file_name.to_str().unwrap());
 }
 
-pub fn resize_webp(id: PathBuf, max_width_size: i32) -> String {
+fn resize_webp(id: PathBuf, max_width_size: i32) -> String {
     let (original_file_name, new_file_name) = get_dirs(id.clone(), max_width_size, "webp");
 
     let f_name = original_file_name.to_str().unwrap();
@@ -43,7 +43,7 @@ pub fn resize_webp(id: PathBuf, max_width_size: i32) -> String {
     return String::from(new_file_name.to_str().unwrap());
 }
 
-pub fn resize_png(id: PathBuf, max_width_size: i32) -> String {
+fn resize_png(id: PathBuf, max_width_size: i32) -> String {
     let (original_file_name, new_file_name) = get_dirs(id.clone(), max_width_size, "png");
     let new_image = VipsImage::new_from_file(original_file_name.to_str().unwrap()).unwrap();
     let resized = ops::thumbnail_image(&new_image, max_width_size).unwrap();
@@ -51,7 +51,7 @@ pub fn resize_png(id: PathBuf, max_width_size: i32) -> String {
     return String::from(new_file_name.to_str().unwrap());
 }
 
-pub fn resize_gif(id: PathBuf, max_width_size: i32) -> String {
+fn resize_gif(id: PathBuf, max_width_size: i32) -> String {
     let (original_file_name, new_file_name) = get_dirs(id.clone(), max_width_size, "gif");
 
     let f_name = original_file_name.to_str().unwrap();

@@ -44,3 +44,26 @@ impl<'a> FromParam<'a> for ImageId<'a> {
             .ok_or(param)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let id = ImageId::new(4);
+        assert_eq!(id.0.len(), 4);
+        assert!(id.0.chars().all(|c| c.is_ascii_alphanumeric()));
+    }
+
+    #[test]
+    fn test_file_path() {
+        let id = ImageId::new(4);
+        assert_eq!(id.file_path(), Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/", "upload")).join(id.0.as_ref()));
+    }
+
+    #[test]
+    fn test_from_param() {
+        assert!(ImageId::from_param("$ wierdo #").is_err());
+    }
+}
